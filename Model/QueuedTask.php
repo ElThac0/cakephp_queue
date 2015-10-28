@@ -232,12 +232,17 @@ class QueuedTask extends AppModel {
 	 * @param string $type jobType to Count
 	 * @return integer
 	 */
-	public function getLength($type = null) {
+	public function getLength($type = null, $omitScheduled = false) {
 		$findConf = array(
 			'conditions' => array(
 				'completed' => null
 			)
 		);
+		
+		if ($omitScheduled) {
+			$findConf['conditions']['notbefore'] = null;
+		}
+
 		if ($type != NULL) {
 			$findConf['conditions']['jobtype'] = $type;
 		}

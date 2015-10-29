@@ -257,8 +257,17 @@ class QueueShell extends Shell {
 	 */
 	public function status() {
 
-		$this->QueuedTask->getLength($type =null, $ignoreScheduled = true);
+		$queue_size = $this->QueuedTask->getLength($type =null, $omitScheduled = true);
 
+		if ($queue_size > self::ALERT_SIZE) {
+			// send alert to team
+
+		}
+		
+		if ($this->args[0] == 'outfile') {
+			
+		}
+		
 	}
 
 	/**

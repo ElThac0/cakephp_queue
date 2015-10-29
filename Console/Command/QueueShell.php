@@ -28,6 +28,8 @@ class QueueShell extends Shell {
 
 	private $exit;
 
+	const ALERT_SIZE;
+
 
 	function getOptionParser() {
 		$parser = parent::getOptionParser();
@@ -250,6 +252,16 @@ class QueueShell extends Shell {
 	}
 
 	/**
+	 * Check the status of the queue, or write the status to a file
+	 * @return null
+	 */
+	public function status() {
+
+		$this->QueuedTask->getLength($type =null, $ignoreScheduled = true);
+
+	}
+
+	/**
 	 * Returns a List of available QueueTasks and their individual configurations.
 	 * @return array
 	 */
@@ -301,4 +313,3 @@ class QueueShell extends Shell {
 	}
 
 }
-?>

@@ -10,6 +10,7 @@ declare(ticks = 1);
  */
 
 App::uses('Folder', 'Utility');
+App::uses('File', 'Utility');
 
 class QueueShell extends Shell {
 	public $uses = array(
@@ -28,7 +29,7 @@ class QueueShell extends Shell {
 
 	private $exit;
 
-	const ALERT_SIZE;
+	const ALERT_SIZE = 50;
 
 
 	function getOptionParser() {
@@ -256,18 +257,33 @@ class QueueShell extends Shell {
 	 * @return null
 	 */
 	public function status() {
+		$info['queue_size'] = $this->QueuedTask->getLength($type = null, $omitScheduled = true);
+		$info['last_task'] = $this->QueuedTask->getLastCompleted();
 
-		$queue_size = $this->QueuedTask->getLength($type =null, $omitScheduled = true);
-
-		if ($queue_size > self::ALERT_SIZE) {
-			// send alert to team
-
+		if ($info['queue_size'] > self::ALERT_SIZE) {
+			$this->sendAlert($info);
 		}
 		
 		if ($this->args[0] == 'outfile') {
-			
+			$this->writeFile($info);
 		}
-		
+
+		$this->out('Queue size: ' . $info['queue_size']);
+		$this->out('Last Job: ' . $info['last_task']['QueuedTask']['completed']);
+	}
+
+	/**
+	 * Write the output of status() to a selected file path.
+	 *
+	 * @param array $info The values to output
+	 * @param array $filepath 
+	 */
+	private function writeFile($info, $filepath = 'tmp/queue_status.json') {
+		App::imddport('File');
+		$file = new File($filepath);
+		$file->write(json_encode($info), $mode = 'w', $force = true);
+		$file->close();
+
 	}
 
 	/**
@@ -312,7 +328,7 @@ class QueueShell extends Shell {
 		}
 	}
 	
-	function out($str='') {
+	function out($str = null, $newlines = 1, $level = Shell::NORMAL) {
 		$str = date('Y-m-d H:i:s').' '.$str;
 		return parent::out($str);
 	}

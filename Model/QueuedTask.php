@@ -230,6 +230,7 @@ class QueuedTask extends AppModel {
 	 * Either returns the number of ALL pending tasks, or the number of pending tasks of the passed Type
 	 *
 	 * @param string $type jobType to Count
+	 * @param boolean $omitScheduled Whether to count jobs that are waiting for a not_before time to execute.
 	 * @return integer
 	 */
 	public function getLength($type = null, $omitScheduled = false) {
@@ -246,6 +247,7 @@ class QueuedTask extends AppModel {
 		if ($type != NULL) {
 			$findConf['conditions']['jobtype'] = $type;
 		}
+
 		return $this->find('count', $findConf);
 	}
 
@@ -351,5 +353,25 @@ class QueuedTask extends AppModel {
 		}
 	
 	}
+
+	/**
+	 * Get the most recently completed task.
+	 *
+	 * 
+	 */
+	public function getLastCompleted() {
+
+		$query = array(
+			'conditions' => array(
+				'completed IS NOT NULL',
+				),
+			'order' => array(
+				'completed' => 'desc',
+				),
+			);
+
+		return $this->QueuedTask->find('first', $query);
+
+	}
 }
-?>
+
